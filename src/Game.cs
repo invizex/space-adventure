@@ -18,7 +18,7 @@ namespace SpaceAdventure
             player = new Player(display.Height);
         }
 
-        public void Start() 
+        public void Start(int collspeed) 
         {
             Console.Clear();
 
@@ -30,6 +30,9 @@ namespace SpaceAdventure
             Thread update = new Thread(new ThreadStart(display.UpdateMap));
             update.Start();
 
+            Thread collision = new Thread(new ParameterizedThreadStart(Collision));
+            collision.Start(collspeed);
+
             // Главный игровой цикл
             while (isGameAvalible)
             {
@@ -38,59 +41,13 @@ namespace SpaceAdventure
 
                 player.Score++;
                 display.Score = player.Score;
-              
-                isCollision();
 
                 Thread.Sleep(Speed);
             }
 
             update.Join(0);
             move.Join(0);
-        }
-
-        // Проверка на столкновение игрока с объектом
-        void isCollision()
-        {
-            if (display.map[player.Y][player.X] == display.MeteorSymbol)
-            {
-                if (player.Health == 1) isGameAvalible = false;
-                else player.Health--;
-            }
-
-            else if (display.map[player.Y][player.X] == display.MoneySymbol)
-            {
-                player.Money++;
-            } 
-                
-            else if (display.map[player.Y][player.X] == display.HealthSymbol && 
-                     player.Health != player.MaxHealth)
-            {
-                player.Health++;
-            }
-        }
-
-        // Вывод информации при проигрыше
-        void GameOver()
-        {
-            Console.Clear();
-
-            SlowTextPrint("►◄►◄█ GAME OVER █►◄►◄\n\n");
-            SlowTextPrint($"Счёт:      {player.Score}\n");
-            SlowTextPrint($"Деньги:    {player.Money}");
-
-            Console.CursorVisible = true;
-            Console.ReadKey();
-            Environment.Exit(0);
-        }
-
-        // Плавный вывод текста 
-        void SlowTextPrint (string text)
-        { 
-            for (int i = 0; i < text.Length; i++)
-            {
-                Thread.Sleep(80);
-                Console.Write(text[i]);
-            }
+            collision.Join(0);
         }
 
         // Передвижение игрока (только по оси X)
@@ -115,6 +72,34 @@ namespace SpaceAdventure
 
                 if (player.X < 0) player.X++;
                 else if (player.X == display.Width) player.X--; 
+            }
+        }
+
+        // Проверка на столкновение игрока с объектом
+        void Collision(object collspeed)
+        {
+            int speed = Convert.ToInt32(collspeed);
+
+            while (isGameAvalible)
+            {
+                if (display.map[player.Y][player.X] == display.MeteorSymbol)
+                {
+                    if (player.Health == 1) isGameAvalible = false;
+                    else player.Health--;
+                }
+
+                else if (display.map[player.Y][player.X] == display.MoneySymbol)
+                {
+                    player.Money++;
+                }
+
+                else if (display.map[player.Y][player.X] == display.HealthSymbol &&
+                         player.Health != player.MaxHealth)
+                {
+                    player.Health++;
+                }
+
+                Thread.Sleep(speed);
             }
         }
     }

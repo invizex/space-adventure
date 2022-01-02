@@ -47,7 +47,7 @@ namespace SpaceAdventure
             while (isGameAvalible)
             {
                 game = new Game(speed, chance);
-                game.Start();
+                game.Start(speed);
                 
                 isGameAvalible = GameOver();
             }
