@@ -4,7 +4,7 @@ namespace SpaceAdventure
 {
     class Program
     {
-        //Точка входа в программу
+        // Точка входа в программу
         static void Main(string[] args)
         {
             try
