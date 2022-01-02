@@ -51,6 +51,7 @@ namespace SpaceAdventure
         public void PrintMap(int x, int y)
         {
             Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = false;
 
             for (int i = 0; i < map.Length; i++)
             {
